@@ -3,13 +3,17 @@ package com.example.mymessenger
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.database.FirebaseDatabase
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.android.synthetic.main.dialog_new_username.*
 import kotlinx.android.synthetic.main.profile_information.*
 
 class ProfileInformationActivity : AppCompatActivity(){
@@ -28,7 +32,8 @@ class ProfileInformationActivity : AppCompatActivity(){
         CurrentUser = LatestMessagesActivity.currentUser
 
         //Loading Username, Email, profile photo
-        actual_username.text = CurrentUser?.username
+        val Actualusername  = findViewById<TextView>(R.id.actual_username)
+        Actualusername.text = CurrentUser?.username
        // actual_email.text = CurrentUser?.????
         // user does not have email information
         val targetImageView = findViewById<CircleImageView>(R.id.info_profile_photo)
@@ -39,33 +44,80 @@ class ProfileInformationActivity : AppCompatActivity(){
         //On edit username
         val editUsername : ImageView = imageViewEditUsername
         editUsername.setOnClickListener {
-
-            openDialog()
+            editUsername()
         }
 
+/*
+    val editUsername : ImageView = imageViewEditUsername
+    editUsername.setOnClickListener {
+
+        openDialog()
+
+
+        val NewUsername = UsernameDialog.newUsername.toString()
+        updateUsername(NewUsername)
     }
+*/
+
+}
+    private fun editUsername(){
+
+        openDialog()
+
+        val NewUsername = UsernameDialog.newUsername.toString()
+        Log.d("ProfileInformation", "Got the username correctly here and passed $")
+
+
+        //actual_username.text = NewUsername
+        //updateUsername(NewUsername)
+
+    }
+
+
 
 
     private fun openDialog(){
         val dialog  = UsernameDialog()
         dialog.show(supportFragmentManager, "Username Dialog")
 
-        val NewUsername : String ?= UsernameDialog.newUsername
+
+
+     /*   val NewUsername : String ?= UsernameDialog.newUsername
 
         if (NewUsername != null)
             updateUsername(NewUsername)
-
+        else
+        {
+            Log.d("ProfileInformation", "Got the username correctly $NewUsername")
+        }
+    */
     }
 
 
-    private  fun updateUsername(newUserName : String){
+
+    private  fun updateUsername(newUserName : String) {
+        Log.d("ProfileInformation", "Got the username correctly $newUserName")
 
         //Get the current user
-        val user = FirebaseAuth.getInstance().currentUser
-        val ProfileUpdates = UserProfileChangeRequest.Builder()
-            .setDisplayName(newUserName)
-            .build()
+        val userRef = FirebaseDatabase.getInstance().getReference("/Users/${CurrentUser?.uid}")
 
+
+
+
+        userRef.child("/username").setValue(newUserName)
+            .addOnCompleteListener {
+                Log.d(
+                    "ProfileInformation",
+                    "Successfully updated username:  ${CurrentUser?.uid} ${CurrentUser?.username}"
+                )
+            }
+            .addOnFailureListener {
+                Log.d("ProfileInformation", "Username update failed: ${it.message}")
+            }
+
+    }
+
+        /*
         user?.updateProfile(ProfileUpdates)
             ?.addOnCompleteListener {
                 val nu = CurrentUser?.username
@@ -76,6 +128,6 @@ class ProfileInformationActivity : AppCompatActivity(){
                 Log.d("ProfileInformation", "Error occurred : ${it.message}")
                 Toast.makeText(this, "Username could not be updated!", Toast.LENGTH_SHORT).show()
             }
+    */
 
-    }
 }
