@@ -85,6 +85,12 @@ class UsernameDialog : AppCompatDialogFragment(){
        }
     }
 
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+
+        return
+    }
+
 
     private  fun updateUsername(newUsername : String) {
         CurrentUser = LatestMessagesActivity.currentUser

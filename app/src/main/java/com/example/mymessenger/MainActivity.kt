@@ -154,6 +154,8 @@ class MainActivity : AppCompatActivity() {
             Log.d("MainActivity", "Valid uri: $selected_photo_uri")
             //return
             val filename =  UUID.randomUUID().toString() //Generate unique identification code for the image
+           // val User_uid = FirebaseAuth.getInstance().uid
+           // val filename = User_uid.toString()
             val ref = FirebaseStorage.getInstance().getReference("/images/$filename") //generate reference to upload
             //Uploading the image to database
             ref.putFile(selected_photo_uri!!)
